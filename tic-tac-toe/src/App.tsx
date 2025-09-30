@@ -29,12 +29,12 @@ function App() {
       if (cells[a] && cells[a] === cells[b] && cells[a] === cells[c]) {
         setWinner(cells[a]);
         setisdisabled(true);
-        return
+        return;
       }
     }
-    if(cells.every((cell)=>cell)){
-      setWinner("Draw")
-      setisdisabled(true)
+    if (cells.every((cell) => cell)) {
+      setWinner("Draw");
+      setisdisabled(true);
     }
   }, [cells]);
   return (
@@ -45,11 +45,13 @@ function App() {
         alignItems: "center",
         flexWrap: "wrap",
         flexDirection: "column",
-        backgroundColor: "lightblue",
+        background: "linear-gradient(to bottom,#7e7ed1,lightblue)",
         padding: "30px",
-        width:"100%"
+        margin: "0 500px",
+        fontFamily:"cursive"
       }}
     >
+      <h2 style={{margin:"0"}}>Tic Tac Toe</h2>
       <div
         style={{
           display: "flex",
@@ -57,18 +59,19 @@ function App() {
           alignItems: "center",
         }}
       >
-        <h2>Winner : {winner}</h2>
+        {winner && <h2>Winner : {winner}</h2>}
         <button
           onClick={() => {
             setCells(Array(9).fill(""));
             setisdisabled(false);
             setxturn(true);
-            setWinner("")
+            setWinner("");
           }}
           style={{
             backgroundColor: "#d03f3fff",
             color: "white",
             margin: "30px",
+            boxShadow:"4px 4px black"
           }}
         >
           Reset
@@ -77,7 +80,6 @@ function App() {
       <div
         style={{
           display: "grid",
-          border: "1px solid #ccc",
           gridTemplateColumns: "repeat(3,100px)",
           gridTemplateRows: "repeat(3,100px)",
         }}
@@ -92,7 +94,7 @@ function App() {
               backgroundColor: "darkblue",
               color: "white",
               fontSize: "24px",
-              cursor: winner ? "not-allowed" :"pointer"
+              cursor: winner ? "not-allowed" : "pointer",
             }}
             onClick={() => handleclick(index)}
           >
@@ -100,7 +102,7 @@ function App() {
           </button>
         ))}
       </div>
-      <h2>{!winner && (xturn ?`X's Turn`:"O's Turn")}</h2>
+      <h2>{!winner && (xturn ? `X's Turn` : "O's Turn")}</h2>
     </div>
   );
 }

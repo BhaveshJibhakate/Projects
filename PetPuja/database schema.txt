@@ -1,0 +1,138 @@
+
+
+
+         contact :  +91 9762 000 333
+
+     hello is this kizora software no. i wanted to ask if you are currently hiring for software developer position
+
+     recenlty i have Completed a paid internship as a Full-Stack Developer, worked on React, Node.js, Express, and MySQL
+
+
+
+
+
+
+
+  CREATE TABLE restaurants (
+  rest_id INT PRIMARY KEY AUTO_INCREMENT,
+  name VARCHAR(100) not null,
+  phone VARCHAR(15),
+  address VARCHAR(100),
+  rating DECIMAL(3,1) DEFAULT 0.0,
+  is_accepting_orders BOOLEAN DEFAULT TRUE,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+ 
+INSERT INTO restaurants (name, phone, address, rating, is_accepting_orders)
+VALUES 
+('GB Club', '07182-123456', 'Khat Road, Bhandara', 7.2, TRUE),
+('Haldiram''s Sweets & Planet Food', '07182-234567', 'Sidhartha Nagar, Bhandara', 8.0, TRUE),
+('Gulmohar Family Restaurant And Hotel', '07182-345678', 'Sidhartha Nagar, Bhandara', 7.1, TRUE),
+('The Cafe', '07182-456789', 'J Jm Patel College Road, Bhandara', 8.3, TRUE),
+('Stop Inn Restaurant', '07182-567890', 'Sakoli, Bhandara', 6.9, TRUE),
+('Sai Darshan Restaurant', '07182-678901', 'Khat Road, Bhandara', 9.0, TRUE);
+
+
+
+  CREATE TABLE categories (
+  category_id INT PRIMARY KEY AUTO_INCREMENT,
+  name VARCHAR(50) NOT NULL
+);
+  INSERT INTO categories (name) VALUES
+('Meals'),
+('Desserts'),
+('Snacks'),
+('Beverages'),('Breakfast');
+
+
+ CREATE TABLE menu_items (
+  item_id INT PRIMARY KEY AUTO_INCREMENT,
+  name VARCHAR(50) NOT NULL,
+  rest_id INT,
+  category_id int,
+  description VARCHAR(200),
+  price DECIMAL(6,2),
+  available BOOLEAN DEFAULT TRUE,
+  FOREIGN KEY (rest_id) REFERENCES restaurants(rest_id),
+  FOREIGN KEY (category_id) REFERENCES categories(category_id)
+);
+
+
+
+INSERT INTO menu_items (name, rest_id, category_id, description, price, available)
+VALUES
+-- GB Club (rest_id = 1)
+('Paneer Butter Masala', 1, 1, 'Creamy North Indian paneer curry with rich gravy', 180.00, TRUE),
+('Butter Naan', 1, 1, 'Tandoori naan with a touch of butter', 40.00, TRUE),
+
+-- Haldiram's (rest_id = 2)
+('Gulab Jamun', 2, 2, 'Soft sweet dumplings soaked in cardamom sugar syrup', 50.00, TRUE),
+('Raj Kachori', 2, 3, 'Crispy shell stuffed with spicy chutneys and curd', 60.00, TRUE),
+
+-- Gulmohar (rest_id = 3)
+('Chicken Biryani', 3, 1, 'Hyderabadi style spicy biryani with marinated chicken', 220.00, TRUE),
+('Veg Pulao', 3, 1, 'Mildly spiced rice with vegetables and ghee', 150.00, TRUE),
+
+-- The Cafe (rest_id = 4)
+('Cold Coffee', 4, 4, 'Iced coffee with cream and chocolate syrup', 90.00, TRUE),
+('French Fries', 4, 3, 'Golden fried potato sticks served with ketchup', 70.00, TRUE),
+
+-- Stop Inn (rest_id = 5)
+('Masala Dosa', 5, 5, 'South Indian dosa with potato filling and chutney', 85.00, TRUE),
+('Idli Sambhar', 5, 5, 'Steamed rice cakes with sambhar and coconut chutney', 60.00, TRUE),
+
+-- Sai Darshan (rest_id = 6)
+('Veg Thali', 6, 1, 'Complete vegetarian meal with roti, rice, dal, sabji, dessert', 120.00, TRUE),
+('Lassi', 6, 4, 'Sweet Punjabi lassi served chilled', 45.00, TRUE);
+
+
+
+
+  
+CREATE TABLE users (
+  id INT PRIMARY KEY AUTO_INCREMENT,
+  name VARCHAR(150) NOT NULL,
+  email VARCHAR(100),
+  password VARCHAR(100),
+  phone VARCHAR(15) NOT NULL,
+  role ENUM('admin', 'user', 'delivery_person', 'owner') DEFAULT 'user',
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+
+
+CREATE TABLE orders (
+    order_id INT PRIMARY KEY AUTO_INCREMENT,
+    cust_id int not null,
+    rest_id INT NOT NULL,
+    amount DECIMAL(8,2) NOT NULL,
+    payment_status ENUM('Pending', 'Paid', 'Failed') DEFAULT 'Pending',
+    FOREIGN KEY (rest_id) REFERENCES restaurants(rest_id)
+    foreign key (cust_id) references users(id)
+);
+
+
+CREATE TABLE order_items (
+  order_items_id INT PRIMARY KEY AUTO_INCREMENT,
+  order_id INT NOT NULL,
+  item_id INT NOT NULL,
+  qty INT DEFAULT 1,
+  price DECIMAL(8,2) NOT NULL,
+  FOREIGN KEY (order_id) REFERENCES orders(order_id),
+  FOREIGN KEY (item_id) REFERENCES menu_items(item_id)
+);
+
+
+
+CREATE TABLE delivery_tracking (
+  tracking_id INT PRIMARY KEY AUTO_INCREMENT,
+  order_id INT NOT NULL,
+  delivery_person_id INT NOT NULL,
+  status ENUM('Picked up', 'On the way', 'Delivered') NOT NULL,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (order_id) REFERENCES orders(order_id),
+  FOREIGN KEY (delivery_person_id) REFERENCES users(id)
+);
+
+
+user  bhavesh jibhakate  bhavesh@gmail.com  12345
