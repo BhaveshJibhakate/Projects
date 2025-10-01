@@ -1,21 +1,15 @@
 import axios from "axios";
-import { jwtDecode } from "jwt-decode";
 import { useState } from "react";
 import { StyledInput } from "./Register";
+import { useSelector } from "react-redux";
 
 interface MenuItemsProps {
   menu: any;
   setflag: Function;
 }
-interface JwtPayload {
-  name: string;
-  id: number;
-  email: string;
-}
 
 const MenuItems: React.FC<MenuItemsProps> = ({ menu, setflag }) => {
-  const token = localStorage.getItem("token");
-  const decoded = token ? jwtDecode<JwtPayload>(token) : null;
+ const {token,user}=useSelector((state:any)=>state) 
 
   const [cart, setcart] = useState<any[]>([]);
   const [message, setmessage] = useState("");
@@ -46,28 +40,35 @@ const MenuItems: React.FC<MenuItemsProps> = ({ menu, setflag }) => {
     }
   };
 
-  const placeOrder = (rest_id: number) => {
+  const placeOrder = (rest_id: number, e: any) => {
+    e.preventDefault();
     if (cart.length === 0) {
       setmessage("⚠️ Cart is empty");
       return;
     }
+    if (!address || address.trim() === "") {
+      setmessage("Please enter delivery address");
+      return;
+    }
     axios
-      .post("http://localhost:5000/order", {
+      .post("http://localhost:5000/user/order", {
         rest_id: rest_id,
-        cust_id: decoded?.id,
+        cust_id: user.id,
         items: cart,
-        address:address
+        address: address,
+      },{
+        headers: { Authorization: `Bearer ${token}` },
       })
       .then(() => {
         setmessage("✅ Order placed successfully!");
         setcart([]);
-        setaddress("")
+        setaddress("");
       })
       .catch((err) => {
         console.log(err);
         setmessage("Something Went Wrong!");
-        setcart([])
-        setaddress("")
+        setcart([]);
+        setaddress("");
       });
   };
 
@@ -136,72 +137,82 @@ const MenuItems: React.FC<MenuItemsProps> = ({ menu, setflag }) => {
                 textAlign: "center",
               }}
               value={cart.find((c) => c.item_id === item.item_id)?.qty || ""}
-              onChange={(e) => updateQty(item, parseInt(e.target.value) || 0)}
+              onChange={(e) => {
+                updateQty(item, parseInt(e.target.value) || 0);
+                setmessage("");
+              }}
             />
           </div>
         ))}
-        <div>
-          <StyledInput
-            type="text"
-            placeholder="Enter address for delivery"
-            value={address}
-            onChange={(e)=>setaddress(e.target.value)}
-          />
-        </div>
-        <div style={{ marginTop: "20px", textAlign: "center" }}>
-          <button
-            onClick={() => placeOrder(menu[0].rest_id)}
-            style={{
-              background: "#057e47",
-              color: "#fff",
-              border: "none",
-              padding: "10px 18px",
-              borderRadius: "8px",
-              cursor: "pointer",
-              marginRight: "10px",
-              fontWeight: "bold",
-              transition: "0.3s",
-            }}
-          >
-            Place Order
-          </button>
-          <button
-            onClick={() => setflag(false)}
-            style={{
-              background: "#ccc",
-              color: "#333",
-              border: "none",
-              padding: "10px 18px",
-              borderRadius: "8px",
-              cursor: "pointer",
-              fontWeight: "bold",
-              transition: "0.3s",
-            }}
-          >
-            Cancel
-          </button>
-        </div>
+        <form onSubmit={(e) => placeOrder(menu[0].rest_id, e)}>
+          <div>
+            <StyledInput
+              type="text"
+              placeholder="Enter address for delivery"
+              value={address}
+              onChange={(e) => {
+                setaddress(e.target.value);
+                setmessage("")
+              }}
+            />
+          </div>
 
-        {message && (
-          <p
-            style={{ textAlign: "center", marginTop: "15px", color: "#e63946" }}
-          >
-            {message}
-          </p>
-        )}
-
-        {cart.length > 0 && (
-          <p
-            style={{
-              marginTop: "20px",
-              fontWeight: "bold",
-              textAlign: "center",
-              fontSize: "16px",
-            }}
-          >
-            💰 Total Billing Amount: ₹{totalAmount}
-          </p>
-        )}
+          {cart.length > 0 && (
+            <p
+              style={{
+                marginTop: "20px",
+                fontWeight: "bold",
+                textAlign: "center",
+                fontSize: "16px",
+              }}
+            >
+              💰 Total Billing Amount: ₹{totalAmount}
+            </p>
+          )}
+          {message && (
+            <p
+              style={{
+                textAlign: "center",
+                marginTop: "15px",
+                color: "#e63946",
+              }}
+            >
+              {message}
+            </p>
+          )}
+          <div style={{ marginTop: "20px", textAlign: "center" }}>
+            <button
+              style={{
+                background: "#057e47",
+                color: "#fff",
+                border: "none",
+                padding: "10px 18px",
+                borderRadius: "8px",
+                cursor: "pointer",
+                marginRight: "10px",
+                fontWeight: "bold",
+                transition: "0.3s",
+              }}
+            >
+              Place Order
+            </button>
+            <button
+              onClick={() => setflag(false)}
+              style={{
+                background: "#ccc",
+                color: "#333",
+                border: "none",
+                padding: "10px 18px",
+                borderRadius: "8px",
+                cursor: "pointer",
+                fontWeight: "bold",
+                transition: "0.3s",
+              }}
+            >
+              Cancel
+            </button>
+          </div>
+        </form>
       </div>
     </div>
   );

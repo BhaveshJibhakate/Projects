@@ -3,7 +3,7 @@ const pool = require("../config/db");
 
 const router = express.Router();
 
-router.get("/delivery-track/:id", async (req, resp) => {
+router.get("/track-order/:id", async (req, resp) => {
   try {
     const delivery_person_id = parseInt(req.params.id);
     const [row] = await pool.execute(

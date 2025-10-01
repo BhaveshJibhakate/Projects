@@ -20,7 +20,9 @@
   address VARCHAR(100),
   rating DECIMAL(3,1) DEFAULT 0.0,
   is_accepting_orders BOOLEAN DEFAULT TRUE,
-  created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+  owner_id int,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  foreign key (owner_id) references users(id)
 );
  
 INSERT INTO restaurants (name, phone, address, rating, is_accepting_orders)
@@ -136,3 +138,27 @@ CREATE TABLE delivery_tracking (
 
 
 user  bhavesh jibhakate  bhavesh@gmail.com  12345
+
+    SELECT o.order_id, o.amount, o.order_status, o.payment_status, o.created_at,
+             r.name AS restaurant_name, u.name AS customer_name, u.phone AS customer_phone
+      FROM orders o
+      JOIN restaurants r ON o.rest_id = r.rest_id
+      JOIN users u ON o.cust_id = u.id
+      WHERE r.owner_id = 2
+      ORDER BY o.created_at DESC
+
+
+
+
+    http://localhost:5000/uploads/GB_Club.jpg
+    http://localhost:5000/uploads/The_Cafe.jpg
+    http://localhost:5000/uploads/Sai_Darshan_Restaurant.jpg
+    http://localhost:5000/uploads/Stop_nn_Restaurant.jpg
+    http://localhost:5000/uploads/Gulmohar Family Restaurant And Hotel.jpg
+    http://localhost:5000/uploads/Haldiram's_Sweets_&_Planet_Food.jpg
+
+
+ALTER TABLE restaurants
+ADD COLUMN image VARCHAR(255) after rating;
+
+					

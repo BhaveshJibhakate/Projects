@@ -1,5 +1,5 @@
-import { jwtDecode } from "jwt-decode";
 import React from "react"
+import { useDispatch, useSelector } from "react-redux";
 import { Navigate } from "react-router-dom";
 
 interface ProtectedRoutesProps {
@@ -7,25 +7,21 @@ interface ProtectedRoutesProps {
     allowedRoles: string;
 }
 
-interface MyJwtPayload {
-    role: string;
-    email:string;
-}
 // this is called route guard
 const ProtectedRoutes = ({ children, allowedRoles }: ProtectedRoutesProps) => {
-    const token = localStorage.getItem('token');
+const user=useSelector((state:any)=>state.user)
+const dispatch=useDispatch()
 
-    if (!token) {
-        return <Navigate to='login' />;
+    if (!user) {
+        return <Navigate to='/login' />;
     }
     try {
-        const decoded = jwtDecode<MyJwtPayload>(token);
-        if (decoded.role === allowedRoles) {
+        if (user.role === allowedRoles) {
             return children;
         }
         else return <h1>You are not authorized</h1>
     } catch (error) {
-        localStorage.removeItem("token")
+        dispatch({type:"LOGOUT"})
         return <Navigate to='/login' replace/>
     }
 };

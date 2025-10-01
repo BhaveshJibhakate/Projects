@@ -1,33 +1,27 @@
 import axios from "axios";
 import { useState } from "react";
-import { jwtDecode } from "jwt-decode";
 import { Link, useNavigate } from "react-router-dom";
 import { StyledInput } from "./Register";
-
-interface JwtPayload {
-  id: number;
-  email: string;
-  role: string;
-}
+import { useDispatch } from "react-redux";
 
 const Login = () => {
   const [credentials, setcredentials] = useState({ email: "", password: "" });
+//   const user = useSelector((state: any) => state.user);
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const handlelogin = (e: any) => {
     e.preventDefault();
     axios
       .post("http://localhost:5000/auth/login", credentials)
       .then((response) => {
-        const token = response.data.token;
-        localStorage.setItem("token", token);
-        const decoded = jwtDecode<JwtPayload>(token);
+        dispatch({ type: "LOGIN", payload: response.data });
 
-        if (decoded.role === "user") {
+        if (response.data.user.role === "user") {
           navigate("/user-dashboard");
-        } else if (decoded.role === "owner") {
+        } else if (response.data.user.role === "owner") {
           navigate("/owner-dashboard");
-        } else if (decoded.role === "delivery_person") {
+        } else if (response.data.user.role === "delivery_person") {
           navigate("/delivery-dashboard");
         }
       })
@@ -41,13 +35,12 @@ const Login = () => {
         height: "100vh",
         width: "100%",
         display: "flex",
-        justifyContent: "center",
+        justifyContent: "space-evenly",
         alignItems: "center",
-        background: "linear-gradient(135deg, #29b978, #057e47)",
-        backgroundImage: `url('/login_page_bg.jpg')`,
-        backgroundSize: "cover",
+        background: "linear-gradient(135deg, #6494c8ff, #FD746C)"
+ 
       }}
-    >
+    > <div style={{color:"#0c1d5a"}}><h1>PetPuja</h1><h3>Hungry? Let the Puja Begin!</h3></div>
       <div
         style={{
           background: "#fff",
@@ -56,6 +49,7 @@ const Login = () => {
           width: "350px",
           boxShadow: "0px 6px 18px rgba(0,0,0,0.2)",
           textAlign: "center",
+
         }}
       >
         <h1 style={{ marginBottom: "25px", color: "#057e47" }}>🔑 Login</h1>
@@ -68,7 +62,6 @@ const Login = () => {
             onChange={(e) =>
               setcredentials({ ...credentials, email: e.target.value })
             }
-          
           />
 
           <StyledInput
@@ -79,7 +72,6 @@ const Login = () => {
             onChange={(e) =>
               setcredentials({ ...credentials, password: e.target.value })
             }
-         
           />
 
           <button

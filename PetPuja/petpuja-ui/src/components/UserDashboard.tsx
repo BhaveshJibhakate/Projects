@@ -2,6 +2,7 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import styled from "styled-components";
 import MenuItems from "./MenuItem";
+import { useSelector } from "react-redux";
 
 const DashboardContainer = styled.div`
   display: grid;
@@ -70,19 +71,24 @@ const UserDashboard = () => {
   const [resto, setresto] = useState<any[]>([]);
   const [flag, setflag] = useState(false);
   const [menu, setmenu] = useState<any[]>([]);
+  const token=useSelector((state:any)=>state.token)
 
   useEffect(() => {
     axios
-      .get("http://localhost:5000/restaurant/all")
+      .get("http://localhost:5000/user/all-restaurants", {
+        headers: { Authorization:`Bearer ${token}`},
+      })
       .then((response) => {
         setresto(response.data);
       })
       .catch((err) => console.log(err));
   }, []);
 
-  const handleclick = (id: number) => {
+  const handleclick = (rest_id: number) => {
     axios
-      .get(`http://localhost:5000/restaurant/${id}/menu`)
+      .get(`http://localhost:5000/user/${rest_id}/menu`,{
+        headers: { Authorization:`Bearer ${token}`},
+      })
       .then((response) => {
         setmenu(response.data);
         setflag(true);
@@ -95,10 +101,7 @@ const UserDashboard = () => {
       <DashboardContainer>
         {resto.map((item, index) => (
           <Card key={index}>
-            <Image
-              src={item.image || "http://localhost:5000/uploads/tic-tac-toe new.png"}
-              alt={item.name}
-            />
+            <Image src={item.image} alt={item.name} />
             <Name>{item.name}</Name>
             <Address>{item.address}</Address>
             <Rating>⭐ {item.rating}</Rating>

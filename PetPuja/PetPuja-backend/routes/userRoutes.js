@@ -1,7 +1,8 @@
 const express = require("express");
 const router = express.Router();
-const pool = require("../config/db"); // use pool instead of connection
+const pool = require("../config/db");
 
+//📌 route for placing order by user
 router.post("/order", async (req, resp) => {
   const { rest_id,cust_id,items,address } = req.body;
 console.log(rest_id, items)
@@ -41,7 +42,7 @@ console.log(rest_id, items)
         "INSERT INTO order_items (order_id, item_id, qty, price) VALUES (?, ?, ?, ?)",
         [orderId, item.item_id, item.qty, item.price]
       );
-    }  resp.status(201).json(orderResult)
+    }  resp.status(201).json({message:"order placed successfully"})
     // resp.status(201).json({
     //   order_id: orderId,
     //   rest_id,
@@ -52,6 +53,34 @@ console.log(rest_id, items)
   } catch (err) {
     console.error(err);
     resp.status(500).json({ error: "Order placement failed" });
+  }
+});
+
+// 📌 List all restaurants
+router.get("/all-restaurants", async (req, resp) => {
+  try {
+    const [results] = await pool.execute("SELECT * FROM restaurants");
+    return resp.json(results);
+  } catch (err) {
+    console.error("Database error:", err);
+    return resp.status(500).json({ error: "Database error" });
+  }
+});
+
+
+// 📌 View menu items of a particular restaurant
+router.get("/:rest_id/menu", async (req, resp) => {
+  const rest_id = req.params.rest_id;
+
+  try {
+    const [results] = await pool.execute(
+      "SELECT * FROM menu_items WHERE rest_id = ? AND available = true",
+      [rest_id]
+    );
+    return resp.json(results);
+  } catch (err) {
+    console.error("Database error:", err);
+    return resp.status(500).json({ error: "Database error" });
   }
 });
 

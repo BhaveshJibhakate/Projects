@@ -1,37 +1,34 @@
-import { jwtDecode } from "jwt-decode";
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
+import { useDispatch, useSelector } from "react-redux";
 
-interface JwtPayload {
-  role: string;
-  email: string;
-  name: string;
-}
 const Title = styled.h3`
   margin: 5px;
   font-size: 24px;
   color: white;
-  margin-left: 48px;
+  margin-left: 12px;
 `;
 
 const Navbar = () => {
+  const user = useSelector((state: any) => state.user);
   const navigate = useNavigate();
-  const token = localStorage.getItem("token");
-  const decoded = token ? jwtDecode<JwtPayload>(token) : null;
+  const dispatch = useDispatch()
+
   const handlelogout = () => {
-    localStorage.clear();
+    dispatch({type:"LOGOUT"})
     navigate("/login");
   };
   return (
-   decoded && <div
-      style={{
-        display: "flex",
-        justifyContent: "space-between",
-        backgroundColor: "black",
-        padding: "0px 5px",
-      }}
-    >
-      <Title>{decoded ? `Welcome, ${decoded?.name} 👋` : ""}</Title>
+    user && (
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          backgroundColor: "black",
+          padding: "0px 5px",
+        }}
+      > <Title>PetPuja</Title>
+        <Title>{user ? `Welcome, ${user.name} 👋` : ""}</Title>
         <button
           onClick={handlelogout}
           style={{
@@ -48,7 +45,8 @@ const Navbar = () => {
         >
           Logout
         </button>
-    </div>
+      </div>
+    )
   );
 };
 

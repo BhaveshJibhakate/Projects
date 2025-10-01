@@ -1,13 +1,7 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
-import { jwtDecode } from "jwt-decode";
 import styled from "styled-components";
-
-interface JwtPayload {
-  id: number;
-  email: string;
-  role: string;
-}
+import { useSelector } from "react-redux";
 
 interface DeliveryData {
   tracking_id: number;
@@ -18,7 +12,7 @@ interface DeliveryData {
   phone: string;
   status: string;
   updated_at: string;
-  address:string;
+  address: string;
 }
 
 // ---------------- Styled Components ----------------
@@ -44,7 +38,7 @@ const Th = styled.th`
   background: #0077ff;
   color: white;
   font-weight: 600;
-  text-align: left;
+  text-align: center;
   font-size: 0.95rem;
 `;
 
@@ -91,19 +85,19 @@ const StatusBadge = styled.span<{ type: string }>`
 `;
 
 const DeliveryDashboard = () => {
-  const token = localStorage.getItem("token");
-  const decoded = token ? jwtDecode<JwtPayload>(token) : null;
-
+  const {token,user} = useSelector((state: any) => state);
   const [Data, setData] = useState<DeliveryData[]>([]);
 
   useEffect(() => {
     axios
-      .get(`http://localhost:5000/delivery-track/${decoded?.id}`)
+      .get(`http://localhost:5000/delivery-person/track-order/${user.id}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      })
       .then((response) => {
         setData(response.data);
       })
       .catch((err) => console.log(err));
-  }, [decoded?.id]);
+  }, [user.id]);
 
   return (
     <Container>

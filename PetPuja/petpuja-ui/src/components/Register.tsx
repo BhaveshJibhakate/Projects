@@ -47,9 +47,7 @@ const Register = () => {
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
-        background: "linear-gradient(135deg, #29b978, #057e47)",
-        backgroundImage: `url('/login_page_bg.jpg')`,
-        backgroundSize: "cover",
+        background: "linear-gradient(135deg, #659bd4ff, #FD746C)"
       }}
     >
       <div

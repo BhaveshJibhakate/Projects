@@ -1,13 +1,7 @@
 import axios from "axios";
-import { jwtDecode } from "jwt-decode";
 import { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
 import styled from "styled-components";
-
-interface JwtPayload {
-  id: number;
-  email: string;
-  role: string;
-}
 
 interface OrderData {
   order_id: number;
@@ -17,7 +11,7 @@ interface OrderData {
   customer_name: string;
   customer_phone: string;
   restaurant_name: string;
-  address:string;
+  address: string;
 }
 
 interface OrderItem {
@@ -55,7 +49,7 @@ const Th = styled.th`
   background: #0077ff;
   color: white;
   font-weight: 600;
-  text-align: left;
+  text-align: center;
 `;
 
 const Td = styled.td`
@@ -133,28 +127,35 @@ const ConfirmButton = styled.button`
 // ---------------- Component ----------------
 
 const OwnerDashboard = () => {
-  const token = localStorage.getItem("token");
-  const decoded = token ? jwtDecode<JwtPayload>(token) : null;
+  const { user, token } = useSelector((state: any) => state);
 
   const [orders, setOrders] = useState<OrderData[]>([]);
   const [detailsData, setDetailsData] = useState<OrderItem[]>([]);
   const [selectedOrderId, setSelectedOrderId] = useState<number | null>(null);
-  const [deliveryPartners, setDeliveryPartners] = useState<DeliveryPartner[]>([]);
-  const [selectedPartnerId, setSelectedPartnerId] = useState<number | null>(null);
+  const [deliveryPartners, setDeliveryPartners] = useState<DeliveryPartner[]>(
+    []
+  );
+  const [selectedPartnerId, setSelectedPartnerId] = useState<number | null>(
+    null
+  );
 
   useEffect(() => {
-    if (!decoded?.id) return;
+    if (!user.id) return;
 
     axios
-      .get(`http://localhost:5000/owner/order/${decoded.id}`)
+      .get(`http://localhost:5000/owner/order/${user.id}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      })
       .then((response) => setOrders(response.data))
       .catch((err) => console.error("Error fetching orders", err));
 
     axios
-      .get(`http://localhost:5000/owner/delivery-person`)
+      .get(`http://localhost:5000/owner/delivery-person`, {
+        headers: { Authorization: `Bearer ${token}` },
+      })
       .then((res) => setDeliveryPartners(res.data))
       .catch((err) => console.error("Failed to fetch delivery partners", err));
-  }, [decoded?.id]);
+  }, [user.id]);
 
   const handleDetails = (order_id: number) => {
     if (selectedOrderId === order_id) {
@@ -164,7 +165,9 @@ const OwnerDashboard = () => {
     }
 
     axios
-      .get(`http://localhost:5000/owner/order-details/${order_id}`)
+      .get(`http://localhost:5000/owner/order-details/${order_id}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      })
       .then((response) => {
         setDetailsData(response.data);
         setSelectedOrderId(order_id);
@@ -179,10 +182,16 @@ const OwnerDashboard = () => {
     }
 
     axios
-      .post(`http://localhost:5000/owner/dispatch-order`, {
-        order_id,
-        delivery_partner_id: selectedPartnerId,
-      })
+      .post(
+        `http://localhost:5000/owner/dispatch-order`,
+        {
+          order_id,
+          delivery_partner_id: selectedPartnerId,
+        },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      )
       .then(() => {
         alert("Order dispatched!");
         setSelectedPartnerId(null);

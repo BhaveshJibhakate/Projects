@@ -3,7 +3,7 @@ const express = require("express");
 const router = express.Router();
 const pool = require("../config/db");
 
-// api to get order received by owner this will be visible for logged in owner
+// api to get order received by owner for his restaurants
 router.get("/order/:id", async (req, resp) => {
   const owner_id = parseInt(req.params.id);
   try {
@@ -26,7 +26,7 @@ router.get("/order/:id", async (req, resp) => {
   }
 });
 
-// completed order
+// api to fetch completed order
 router.get("/order/completed/:id", async (req, resp) => {
   const owner_id = parseInt(req.params.id);
   try {
@@ -81,18 +81,16 @@ router.post("/dispatch-order", async (req, res) => {
   const { order_id, delivery_partner_id } = req.body;
 
   try {
-    // Update the order status
-    await pool.execute(
-      `UPDATE orders SET order_status = ? WHERE order_id = ?`,
-      ["In-Process", order_id]
-    );
-
     // Insert into delivery tracking
     await pool.execute(
       `INSERT INTO delivery_tracking (order_id, delivery_person_id) VALUES (?, ?)`,
       [order_id, delivery_partner_id]
     );
-
+    // Update the order status
+    await pool.execute(
+      `UPDATE orders SET order_status = ? WHERE order_id = ?`,
+      ["In-Process", order_id]
+    );
     // Send success response
     res.status(200).json({ message: "Order dispatched successfully" });
   } catch (error) {
