@@ -1,18 +1,5 @@
 
 
-
-         contact :  +91 9762 000 333
-
-     hello is this kizora software no. i wanted to ask if you are currently hiring for software developer position
-
-     recenlty i have Completed a paid internship as a Full-Stack Developer, worked on React, Node.js, Express, and MySQL
-
-
-
-
-
-
-
   CREATE TABLE restaurants (
   rest_id INT PRIMARY KEY AUTO_INCREMENT,
   name VARCHAR(100) not null,
@@ -137,7 +124,6 @@ CREATE TABLE delivery_tracking (
 );
 
 
-user  bhavesh jibhakate  bhavesh@gmail.com  12345
 
     SELECT o.order_id, o.amount, o.order_status, o.payment_status, o.created_at,
              r.name AS restaurant_name, u.name AS customer_name, u.phone AS customer_phone
@@ -147,15 +133,6 @@ user  bhavesh jibhakate  bhavesh@gmail.com  12345
       WHERE r.owner_id = 2
       ORDER BY o.created_at DESC
 
-
-
-
-    http://localhost:5000/uploads/GB_Club.jpg
-    http://localhost:5000/uploads/The_Cafe.jpg
-    http://localhost:5000/uploads/Sai_Darshan_Restaurant.jpg
-    http://localhost:5000/uploads/Stop_nn_Restaurant.jpg
-    http://localhost:5000/uploads/Gulmohar Family Restaurant And Hotel.jpg
-    http://localhost:5000/uploads/Haldiram's_Sweets_&_Planet_Food.jpg
 
 
 ALTER TABLE restaurants
