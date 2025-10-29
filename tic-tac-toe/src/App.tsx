@@ -32,7 +32,7 @@ function App() {
         return;
       }
     }
-    if (cells.every((cell) => cell)) {
+    if (cells.every((cell:any) => cell)) {
       setWinner("Draw");
       setisdisabled(true);
     }

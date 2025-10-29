@@ -6,8 +6,11 @@ const pool = require("../config/db");
 router.post("/order", async (req, resp) => {
   const { rest_id,cust_id,items,address } = req.body;
 console.log(rest_id, items)
+let conn
   try {
     // 1. Check if restaurant is accepting orders
+    conn=await pool.getConnection()
+    await conn.beginTransaction()
     const [restaurants] = await pool.execute(
       "SELECT * FROM restaurants WHERE rest_id = ? AND is_accepting_orders = true",
       [rest_id]
@@ -42,6 +45,7 @@ console.log(rest_id, items)
         "INSERT INTO order_items (order_id, item_id, qty, price) VALUES (?, ?, ?, ?)",
         [orderId, item.item_id, item.qty, item.price]
       );
+      await conn.commit()
     }  resp.status(201).json({message:"order placed successfully"})
     // resp.status(201).json({
     //   order_id: orderId,
@@ -51,6 +55,7 @@ console.log(rest_id, items)
     //   status: "pending",
     // });
   } catch (err) {
+    if(conn) await conn.rollback()
     console.error(err);
     resp.status(500).json({ error: "Order placement failed" });
   }

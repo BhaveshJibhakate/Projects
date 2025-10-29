@@ -26,7 +26,7 @@ router.get("/order/:id", async (req, resp) => {
   }
 });
 
-// api to fetch completed order
+// api to fetch completed order---------we did not implemented yet
 router.get("/order/completed/:id", async (req, resp) => {
   const owner_id = parseInt(req.params.id);
   try {
@@ -77,10 +77,15 @@ router.get("/delivery-person", async (req, resp) => {
 
 // order processing api it will change the status of order as processing
 // into orders table and insert data into delivery-tracking
+// it will also associate the id of delivery person into the orders table which is initially empty while the order was placed
 router.post("/dispatch-order", async (req, res) => {
   const { order_id, delivery_partner_id } = req.body;
-
+  let conn;
   try {
+    conn = await pool.getConnection();
+    conn.beginTransaction();
+    // update orders table for associating the id of delivery person with orders
+    await pool.execute(`update orders set delivery_person_id=? where order_id=?`,[delivery_partner_id,order_id])
     // Insert into delivery tracking
     await pool.execute(
       `INSERT INTO delivery_tracking (order_id, delivery_person_id) VALUES (?, ?)`,
@@ -92,8 +97,10 @@ router.post("/dispatch-order", async (req, res) => {
       ["In-Process", order_id]
     );
     // Send success response
+    conn.commit();
     res.status(200).json({ message: "Order dispatched successfully" });
   } catch (error) {
+    conn.rollback();
     console.error("Dispatch failed:", error);
     res.status(500).json({ message: "Failed to dispatch order" });
   }

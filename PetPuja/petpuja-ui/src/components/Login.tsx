@@ -12,8 +12,9 @@ const Login = () => {
 
   const handlelogin = (e: any) => {
     e.preventDefault();
+    const BASE_URL="http://localhost:8080/"
     axios
-      .post("http://localhost:5000/auth/login", credentials)
+      .post(`${BASE_URL}auth/login`, credentials)
       .then((response) => {
         dispatch({ type: "LOGIN", payload: response.data });
 
@@ -37,7 +38,7 @@ const Login = () => {
         display: "flex",
         justifyContent: "space-evenly",
         alignItems: "center",
-        background: "linear-gradient(135deg, #6494c8ff, #FD746C)"
+        background: "linear-gradient(135deg, #FD746C, #6494c8ff)"
  
       }}
     > <div style={{color:"#0c1d5a"}}><h1>PetPuja</h1><h3>Hungry? Let the Puja Begin!</h3></div>

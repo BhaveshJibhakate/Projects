@@ -4,29 +4,23 @@ import { useSelector, useDispatch } from "react-redux";
 import { fetchProductsRequest } from "../Redux/productAction";
 import { ClipLoader } from "react-spinners";
 import Pagination from "../Component/Pagination";
-import Categories from "../Component/Category";
 
 const Products: React.FC = () => {
   const { loading, error, Allproducts } = useSelector(
     (state: any) => state.products
   );
-  const [Products, setProducts] = useState(Allproducts);
   const dispatch = useDispatch();
 
   useEffect(() => {
     dispatch(fetchProductsRequest());
   }, [dispatch]);
-
-  useEffect(() => {
-    setProducts(Allproducts);
-  }, [Allproducts]);
   //pagination related logic
-  const itemsperPage = 12;
-  const [currentpage, setcurrentPage] = useState<number>(1);
-  const lastindex = itemsperPage * currentpage;
-  const firstindex = lastindex - itemsperPage;
-  const totalpage = Math.ceil(Products.length / itemsperPage);
-  const visibleProducts = Products.slice(firstindex, lastindex);
+  const itemsperPage=12;
+  const [currentpage,setcurrentPage]=useState<number>(1)
+  const lastindex=itemsperPage*currentpage
+  const firstindex=lastindex-itemsperPage
+  const totalpage=Math.ceil(Allproducts.length/itemsperPage)
+  const visibleProducts=Allproducts.slice(firstindex,lastindex)
   //
   return (
     <div style={{ padding: "20px", backgroundColor: "antiquewhite" }}>
@@ -36,12 +30,11 @@ const Products: React.FC = () => {
           textAlign: "center",
           fontSize: "2rem",
           fontWeight: "bold",
-          margin: "0",
         }}
       >
         Our Products
       </h2>
-      <Categories setProducts={setProducts} />
+
       {loading && (
         <div style={{ display: "flex", justifyContent: "center" }}>
           <ClipLoader color="red" size={80} />
@@ -72,8 +65,8 @@ const Products: React.FC = () => {
           />
         ))}
       </div>
-      {visibleProducts.length > 0 && (
-        <Pagination
+          {visibleProducts.length > 0 && (
+          <Pagination
           currentPage={currentpage}
           totalpage={totalpage}
           onPageChange={setcurrentPage}

@@ -7,12 +7,15 @@ import OwnerDashboard from "./components/OwnerDashboard";
 import DeliveryDashboard from "./components/DeliveryDashboard";
 import Navbar from "./components/Navbar";
 import ProtectedRoutes from "./components/ProtectedRoutes";
+import SearchBar from "./components/SearchBar";
+import AdminDashboard from "./components/AdminDashboard";
 
 function App(): any {
   return (
     <Router>
       <Navbar />
       <Routes>
+        <Route path="/" element={<Login />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route
@@ -39,6 +42,8 @@ function App(): any {
             </ProtectedRoutes>
           }
         />
+        <Route path="/admin-dashboard" element={<AdminDashboard/>}/>
+        <Route path="/searchbar" element={<SearchBar/>}/>
       </Routes>
     </Router>
   );
