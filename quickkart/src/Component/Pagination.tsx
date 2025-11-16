@@ -1,29 +1,4 @@
 import React from "react";
-import styled from "styled-components";
-
-interface ButtonProps {
-  $bg?: string;
-  $active?: boolean;
-}
-const StyledButton = styled.button<ButtonProps>`
-  background-color: ${(props) => (props.$active ? "#2563eb" : "#f1f5f9")};
-  color: ${(props) => (props.$active ? "white" : "#1e293b")};
-  cursor: pointer;
-  font-size: 14px;
-  font-weight: bold;
-  border-radius: 6px;
-  border: 1px solid #cbd5e1;
-  padding: 8px 14px;
-  transition: all 0.2s ease;
-
-  &:disabled {
-    cursor: not-allowed;
-  }
-
-  &:hover:not(:disabled) {
-    background-color: ${(props) => (props.$active ? "#1d4ed8" : "#e2e8f0")};
-  }
-`;
 
 interface PaginationProps {
   currentPage: number;
@@ -37,42 +12,52 @@ const Pagination: React.FC<PaginationProps> = ({
 }) => {
   const buttonCount = Array.from(
     { length: totalpage },
-    (element, index) => index + 1
+    (_, index) => index + 1
   );
   return (
     <>
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "center",
-          gap: "10px",
-          marginTop: "10px",
-          flexWrap:"wrap"
-        }}
-      >
-        <StyledButton
-          $bg="lightgreen"
+      <div className="flex flex-wrap justify-center gap-2 mt-4">
+        <button
           disabled={currentPage === 1}
           onClick={() => onPageChange(currentPage - 1)}
+          className={`px-4 py-2 rounded-md font-semibold text-sm border border-slate-300 transition-all duration-200
+            ${
+              currentPage === 1
+                ? "bg-slate-200 text-slate-400 cursor-not-allowed"
+                : "bg-slate-100 text-slate-800 hover:bg-slate-200 cursor-pointer"
+            }
+            `}
         >
           Prev
-        </StyledButton>
-        {buttonCount.map((i) => (
-          <StyledButton
-            $bg="lightblue"
-            onClick={() => onPageChange(i)}
-            $active={i === currentPage}
+        </button>
+        {buttonCount.map((num) => (
+          <button
+            key={num}
+            onClick={() => onPageChange(num)}
+            className={`px-4 py-2 rounded-md font-semibold text-sm border border-slate-300 transition-all duration-200 focus:outline-none
+              ${
+                num === currentPage
+                  ? "bg-blue-600 text-white hover:bg-blue-700"
+                  : "bg-slate-100 text-slate-800 hover:bg-slate-200"
+              }
+              `}
           >
-            {i}
-          </StyledButton>
+            {num}
+          </button>
         ))}
-        <StyledButton
-          $bg="lightgreen"
+        <button
           disabled={currentPage === totalpage}
           onClick={() => onPageChange(currentPage + 1)}
+          className={`px-4 py-2 rounded-md font-semibold text-sm border border-slate-300 transition-all duration-200
+            ${
+              currentPage === totalpage
+                ? "bg-slate-200 text-slate-400 cursor-not-allowed"
+                : "bg-slate-100 text-slate-800 hover:bg-slate-200 cursor-pointer"
+            }
+            `}
         >
           Next
-        </StyledButton>
+        </button>
       </div>
     </>
   );

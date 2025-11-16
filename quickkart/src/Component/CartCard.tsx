@@ -1,68 +1,13 @@
 import React from "react";
 import { useDispatch } from "react-redux";
-import { decreaseQuantity, increaseQuantity, removeFromCart } from "../Redux/cartActions";
-import styled from "styled-components";
+import {
+  decreaseQuantity,
+  increaseQuantity,
+  removeFromCart,
+} from "../Redux/cartActions";
 
 // Styled button
-export const StyledButton = styled.button`
-  border: none;
-  cursor: pointer;
-  background-color: #abe55f;
-  font-weight: bold;
-  font-size: 16px;
-  padding: 4px 8px;
-  border-radius: 4px;
 
-  @media (max-width: 480px) {
-    font-size: 14px;
-    padding: 6px 10px;
-  }
-`;
-
-const CardWrapper = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  margin-bottom: 15px;
-  padding: 10px;
-  background-color: #f9f9f9;
-
-  @media (max-width: 768px) {
-    flex-direction: column;
-    text-align: center;
-    gap: 15px;
-  }
-`;
-
-const ProductImage = styled.img`
-  height: 100px;
-  width: 100px;
-  object-fit: cover;
-
-  @media (max-width: 768px) {
-    width: 80%;
-    height: auto;
-  }
-`;
-
-const Details = styled.div`
-  flex: 2;
-  margin-left: 15px;
-
-  @media (max-width: 768px) {
-    margin-left: 0;
-  }
-`;
-
-const SubtotalSection = styled.div`
-  text-align: right;
-
-  @media (max-width: 768px) {
-    text-align: center;
-  }
-`;
 
 interface CartCardProps {
   id: number;
@@ -72,45 +17,56 @@ interface CartCardProps {
   quantity: number;
 }
 
-const CartCard: React.FC<CartCardProps> = ({ id, title, price, images, quantity }) => {
+const CartCard: React.FC<CartCardProps> = ({
+  id,
+  title,
+  price,
+  images,
+  quantity,
+}) => {
   const dispatch = useDispatch();
 
   return (
-    <CardWrapper>
+    <div className="flex justify-between items-center border border-gray-300 rounded-lg mb-4 p-3 bg-gray-50 shadow-sm flex-col md:flex-row md:text-left text-center gap-3">
       {/* Left - Image */}
-      <ProductImage src={images} alt={title} />
+      <img
+        src={images}
+        alt={title}
+        className="w-24 h-24 object-cover rounded-md md:w-28 md:h-28"
+      />
 
       {/* Middle - Details */}
-      <Details>
-        <p style={{ fontWeight: "bold", fontSize: "16px", margin: 0 }}>{title}</p>
-        <p style={{ margin: "5px 0" }}>Price: Rs.{price}</p>
-        <div style={{ display: "flex", gap: "10px", alignItems: "center", justifyContent: "center" }}>
-          <span>Qty:</span>
-          <StyledButton onClick={() => dispatch(increaseQuantity(id))}>+</StyledButton>
-          <span>{quantity}</span>
-          <StyledButton onClick={() => dispatch(decreaseQuantity(id))}>-</StyledButton>
+      <div className="flex-1 md:ml-4">
+        <p className="font-semibold text-base md:text-lg mb-1">{title}</p>
+        <p className="text-gray-700 mb-2">Price: Rs.{price}</p>
+        <div className="flex items-center justify-center md:justify-start gap-3">
+          <span className="font-medium">Qty:</span>
+          <button
+            onClick={() => dispatch(increaseQuantity(id))}
+            className="bg-lime-400 hover:bg-lime-500 text-gray-900 font-bold text-base px-2 py-1 rounded-md transition-all duration-150"
+          >
+            +
+          </button>
+          <span className="font-semibold">{quantity}</span>
+          <button
+            onClick={() => dispatch(decreaseQuantity(id))}
+            className="bg-lime-400 hover:bg-lime-500 text-gray-900 font-bold text-base px-2 py-1 rounded-md transition-all duration-150"
+          >
+            -
+          </button>
         </div>
-      </Details>
+      </div>
 
       {/* Right - Subtotal & Remove */}
-      <SubtotalSection>
-        <p style={{ margin: "5px 0" }}>Subtotal: Rs.{(price * quantity).toFixed(2)}</p>
-        <button
-          onClick={() => dispatch(removeFromCart(id))}
-          style={{
-            border: "none",
-            fontSize: "12px",
-            padding: "8px 18px",
-            cursor: "pointer",
-            backgroundColor: "#d66436",
-            color: "white",
-            borderRadius: "8px",
-          }}
-        >
-          Remove
-        </button>
-      </SubtotalSection>
-    </CardWrapper>
+      <div className="text-center md:text-right">
+        <p className="text-gray-800 mb-2 font-medium">
+          Subtotal: Rs.{(price * quantity).toFixed(2)}
+        </p>
+        <button 
+        className="bg-orange-600 hover:bg-orange-700 text-white text-sm px-4 py-2 rounded-md transition-all duration-150"
+        onClick={() => dispatch(removeFromCart(id))}>Remove</button>
+      </div>
+    </div>
   );
 };
 

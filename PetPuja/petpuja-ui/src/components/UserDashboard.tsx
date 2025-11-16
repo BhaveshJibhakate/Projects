@@ -3,12 +3,14 @@ import { useEffect, useState } from "react";
 import styled from "styled-components";
 import MenuItems from "./MenuItem";
 import { useSelector } from "react-redux";
+import Carousel from "./HomePage";
 
 const DashboardContainer = styled.div`
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
   gap: 20px;
   padding: 20px;
+  background-color: beige;
 `;
 
 const Card = styled.div`
@@ -71,12 +73,12 @@ const UserDashboard = () => {
   const [resto, setresto] = useState<any[]>([]);
   const [flag, setflag] = useState(false);
   const [menu, setmenu] = useState<any[]>([]);
-  const token=useSelector((state:any)=>state.token)
+  const token = useSelector((state: any) => state.token);
 
   useEffect(() => {
     axios
       .get("http://localhost:5000/user/all-restaurants", {
-        headers: { Authorization:`Bearer ${token}`},
+        headers: { Authorization: `Bearer ${token}` },
       })
       .then((response) => {
         setresto(response.data);
@@ -86,8 +88,8 @@ const UserDashboard = () => {
 
   const handleclick = (rest_id: number) => {
     axios
-      .get(`http://localhost:5000/user/${rest_id}/menu`,{
-        headers: { Authorization:`Bearer ${token}`},
+      .get(`http://localhost:5000/user/${rest_id}/menu`, {
+        headers: { Authorization: `Bearer ${token}` },
       })
       .then((response) => {
         setmenu(response.data);
@@ -111,7 +113,6 @@ const UserDashboard = () => {
           </Card>
         ))}
       </DashboardContainer>
-
       {flag && <MenuItems menu={menu} setflag={setflag} />}
     </>
   );

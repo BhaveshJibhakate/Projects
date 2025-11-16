@@ -23,36 +23,27 @@ const Products: React.FC = () => {
   const visibleProducts=Allproducts.slice(firstindex,lastindex)
   //
   return (
-    <div style={{ padding: "20px", backgroundColor: "antiquewhite" }}>
+    <div className="bg-[antiquewhite] min-h-screen px-6 py-10">
       <h2
-        style={{
-          marginBottom: "20px",
-          textAlign: "center",
-          fontSize: "2rem",
-          fontWeight: "bold",
-        }}
+       className="text-3xl font-extrabold text-center text-gray-800 mb-5"
       >
         Our Products
       </h2>
 
       {loading && (
-        <div style={{ display: "flex", justifyContent: "center" }}>
+        <div className="flex justify-center items-center py-10">
           <ClipLoader color="red" size={80} />
         </div>
       )}
 
       {error && (
-        <h2 style={{ color: "red", textAlign: "center" }}>
+        <h2 className="text-center text-red-600 text-xl font-semibold">
           Something went wrong
         </h2>
       )}
 
       <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))",
-          gap: "20px",
-        }}
+       className="grid gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5"
       >
         {visibleProducts.map((item: any) => (
           <ProductCard

@@ -1,98 +1,41 @@
 import React from "react";
-import styled from "styled-components";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faShoppingCart } from "@fortawesome/free-solid-svg-icons";
 
-const Nav = styled.nav`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 10px 25px;
-  background-color: #282c35;
-  color: white;
-
-  @media (max-width: 768px) {
-    flex-direction: column;
-    align-items: flex-start;
-    padding: 10px 15px;
-  }
-`;
-
-const Logo = styled.div`
-  font-size: 20px;
-  font-weight: bold;
-
-  @media (max-width: 480px) {
-    font-size: 18px;
-  }
-`;
-
-const LinksContainer = styled.div`
-  display: flex;
-  gap: 15px;
-
-  @media (max-width: 768px) {
-    margin-top: 10px;
-    gap: 10px;
-    flex-direction: column;
-    width: 100%;
-  }
-`;
-
-const StyledLink = styled(Link)`
-  text-decoration: none;
-  color: white;
-  font-size: 16px;
-
-  &:hover {
-    color: #61dafb;
-  }
-
-  @media (max-width: 480px) {
-    font-size: 14px;
-  }
-`;
-
-const CartWrapper = styled.div`
-  position: relative;
-  display: inline-block;
-`;
-
-const CartCount = styled.span`
-  position: absolute;
-  top: -8px;
-  right: -10px;
-  background: red;
-  color: white;
-  font-size: 12px;
-  font-weight: bold;
-  border-radius: 50%;
-  padding: 3px 6px;
-`;
-
 const Navbar: React.FC = () => {
+
+  const location=useLocation()
+  console.log(location)
   const { cartItems } = useSelector((state: any) => state.cart);
   const totalItems = cartItems.reduce(
     (acc: number, item: any) => acc + item.quantity,
     0
   );
-
+  if(location.pathname!=="/form")
   return (
-    <Nav>
-      <Logo>QuickKart</Logo>
-      <LinksContainer>
-        <StyledLink to="/">Home</StyledLink>
-        <StyledLink to="/products">Products</StyledLink>
-        <StyledLink to="/cart">
-          <CartWrapper>
+    <nav className="flex justify-between items-center text-white bg-[#282c35] px-6 py-3 flex-wrap md:flex-nowrap">
+      <div className="text-lg md:text-xl font-bold">QuickKart</div>
+      <div className="flex flex-col md:flex-row md:items-center gap-3 md:gap-6 w-full md:w-auto mt-2 md:mt-0">
+        <Link to="/" className="text-white">
+          Home
+        </Link>
+        <Link to="/products" className="text-white hover:text-[#61dafb]">
+          Products
+        </Link>
+        <Link to="/cart" className="relative text-white hover:text-[#61dafb]">
+          <div className="text-inherit">
             <FontAwesomeIcon icon={faShoppingCart} size="lg" />
-            {totalItems > 0 && <CartCount>{totalItems}</CartCount>}
-          </CartWrapper>
-        </StyledLink>
-      </LinksContainer>
-    </Nav>
+            {totalItems > 0 && 
+              <span className="absolute bg-red-600 text-white text-xs font-bold rounded-full px-[6px] py-[2px]">
+                {totalItems}
+              </span>
+            }
+          </div>
+        </Link>
+      </div>
+    </nav>
   );
 };
 

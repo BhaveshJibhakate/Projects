@@ -13,7 +13,7 @@ const user=useSelector((state:any)=>state.user)
 const dispatch=useDispatch()
 
     if (!user) {
-        return <Navigate to='/login' />;
+        return <Navigate to='/' />;
     }
     try {
         if (user.role === allowedRoles) {
@@ -22,7 +22,7 @@ const dispatch=useDispatch()
         else return <h1>You are not authorized</h1>
     } catch (error) {
         dispatch({type:"LOGOUT"})
-        return <Navigate to='/login' replace/>
+        return <Navigate to='/' replace/>
     }
 };
 

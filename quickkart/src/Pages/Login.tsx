@@ -1,26 +1,4 @@
 import React, { useState } from "react";
-import styled from "styled-components";
-
-const StyledInput = styled.input`
-  width: 100%;
-  padding: 10px;
-  margin-bottom: 20px;
-  border-radius: 6px;
-  border: 1px solid #ccc;
-  font-size: 14px;
-`;
-
-const StyledButton = styled.button` 
-        width: 100%;
-        padding: 10px;
-        background-color:#4CAF50;
-        color: white;
-        border: none;
-        border-radius: 6px;
-        font-size: 16px;
-        cursor: pointer;
-        transition: background 0.3s ease; 
-`;
 
 const Login: React.FC = () => {
   const [user, setUser] = useState({ username: "", password: "" });
@@ -29,39 +7,29 @@ const Login: React.FC = () => {
     console.log("function triggered after login button is clicked");
   };
   return (
-    <div
-      style={{
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        backgroundColor: "darkcyan",
-        height: "300px",
-      }}
-    >
-      <div
-        style={{
-          backgroundColor: "white",
-          padding: "40px",
-          borderRadius: "10px",
-          textAlign: "center",
-          width: "350px",
-          boxShadow: "0 8px 16px rgba(0, 0, 0, 0.2)",
-        }}
-      >
-        <h1 style={{ marginBottom: "20px", color: "#333" }}>Login</h1>
-        <StyledInput
+    <div className="flex justify-center items-center min-h-screen bg-cyan-700">
+      <div className="bg-white rounded-lg shadow-lg w-[350px] p-8 text-center">
+        <h2 className="text-3xl font-bold text-gray-800 mb-6">Login</h2>
+        <input
+          className="w-full p-[10px] mb-5 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-cyan-500"
           type="text"
           placeholder="enter username"
           value={user.username}
           onChange={(e) => setUser({ ...user, username: e.target.value })}
         />
-        <StyledInput
+        <input
+          className="w-full p-[10px] mb-6 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-cyan-500"
           type="password"
           placeholder="enter password"
           value={user.password}
           onChange={(e) => setUser({ ...user, password: e.target.value })}
         />
-        <StyledButton onClick={handlelogin}>Login</StyledButton>
+        <button
+          onClick={handlelogin}
+          className="w-full py-[10px] bg-green-600 hover:bg-green-700 text-white font-medium text-base rounded-md transition duration-300"
+        >
+          Login
+        </button>
       </div>
     </div>
   );

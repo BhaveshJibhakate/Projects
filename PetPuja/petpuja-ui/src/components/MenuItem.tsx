@@ -1,6 +1,5 @@
 import axios from "axios";
 import { useState } from "react";
-import { StyledInput } from "./Register";
 import { useSelector } from "react-redux";
 
 interface MenuItemsProps {
@@ -9,7 +8,7 @@ interface MenuItemsProps {
 }
 
 const MenuItems: React.FC<MenuItemsProps> = ({ menu, setflag }) => {
- const {token,user}=useSelector((state:any)=>state) 
+  const { token, user } = useSelector((state: any) => state);
 
   const [cart, setcart] = useState<any[]>([]);
   const [message, setmessage] = useState("");
@@ -51,14 +50,18 @@ const MenuItems: React.FC<MenuItemsProps> = ({ menu, setflag }) => {
       return;
     }
     axios
-      .post("http://localhost:5000/user/order", {
-        rest_id: rest_id,
-        cust_id: user.id,
-        items: cart,
-        address: address,
-      },{
-        headers: { Authorization: `Bearer ${token}` },
-      })
+      .post(
+        "http://localhost:5000/user/order",
+        {
+          rest_id: rest_id,
+          cust_id: user.id,
+          items: cart,
+          address: address,
+        },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      )
       .then(() => {
         setmessage("✅ Order placed successfully!");
         setcart([]);
@@ -146,13 +149,23 @@ const MenuItems: React.FC<MenuItemsProps> = ({ menu, setflag }) => {
         ))}
         <form onSubmit={(e) => placeOrder(menu[0].rest_id, e)}>
           <div>
-            <StyledInput
+            <input
               type="text"
               placeholder="Enter address for delivery"
               value={address}
-              onChange={(e) => {
+              onChange={(e: any) => {
                 setaddress(e.target.value);
-                setmessage("")
+                setmessage("");
+              }}
+              style={{
+                width: "100%",
+                padding: "12px",
+                borderRadius: "8px",
+                border: "1px solid #ccc",
+                fontSize: "16px",
+                outline: "none",
+                boxSizing: "border-box",
+                marginBottom: "15px",
               }}
             />
           </div>

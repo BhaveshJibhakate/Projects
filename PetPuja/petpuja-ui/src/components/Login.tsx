@@ -1,10 +1,11 @@
 import axios from "axios";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { StyledInput } from "./Register";
 import { useDispatch } from "react-redux";
-
-const Login = () => {
+interface LoginProps{
+  setactiveForm:Function
+}
+const Login:React.FC<LoginProps> = ({setactiveForm})=> {
   const [credentials, setcredentials] = useState({ email: "", password: "" });
 //   const user = useSelector((state: any) => state.user);
   const navigate = useNavigate();
@@ -12,7 +13,7 @@ const Login = () => {
 
   const handlelogin = (e: any) => {
     e.preventDefault();
-    const BASE_URL="http://localhost:8080/"
+    const BASE_URL="http://localhost:5000/"
     axios
       .post(`${BASE_URL}auth/login`, credentials)
       .then((response) => {
@@ -32,71 +33,97 @@ const Login = () => {
 
   return (
     <div
-      style={{
-        height: "100vh",
-        width: "100%",
-        display: "flex",
-        justifyContent: "space-evenly",
-        alignItems: "center",
-        background: "linear-gradient(135deg, #FD746C, #6494c8ff)"
- 
-      }}
-    > <div style={{color:"#0c1d5a"}}><h1>PetPuja</h1><h3>Hungry? Let the Puja Begin!</h3></div>
-      <div
         style={{
-          background: "#fff",
-          padding: "40px 30px",
+          position: "absolute",
+          top: "50%",
+          right: "40px",
+          transform: "translateY(-50%)",
+          background: "rgba(0, 0, 0, 0.55)",
+          padding: "25px",
           borderRadius: "12px",
-          width: "350px",
-          boxShadow: "0px 6px 18px rgba(0,0,0,0.2)",
-          textAlign: "center",
-
+          width: "320px",
+          backdropFilter: "blur(4px)",
+          boxShadow: "0 4px 20px rgba(0,0,0,0.5)",
         }}
       >
-        <h1 style={{ marginBottom: "25px", color: "#057e47" }}>🔑 Login</h1>
-        <form onSubmit={handlelogin}>
-          <StyledInput
-            required={true}
-            type="text"
+        <form
+          style={{ display: "flex", flexDirection: "column" }}
+          onSubmit={handlelogin}
+        >
+          {/* Email */}
+          <label style={{ color: "white", marginBottom: "5px",textAlign:"left" }}>Email</label>
+          <input
+            required
+            type="email"
             placeholder="Enter email"
             value={credentials.email}
             onChange={(e) =>
               setcredentials({ ...credentials, email: e.target.value })
             }
+            style={{
+              padding: "12px",
+              borderRadius: "8px",
+              border: "none",
+              marginBottom: "15px",
+              fontSize: "15px",
+              outline: "none",
+            }}
           />
 
-          <StyledInput
-            required={true}
+          {/* Password */}
+          <label style={{ color: "white", marginBottom: "5px",textAlign:"left" }}>
+            Password
+          </label>
+          <input
+            required
             type="password"
             placeholder="Enter password"
             value={credentials.password}
             onChange={(e) =>
               setcredentials({ ...credentials, password: e.target.value })
             }
+            style={{
+              padding: "12px",
+              borderRadius: "8px",
+              border: "none",
+              marginBottom: "20px",
+              fontSize: "15px",
+              outline: "none",
+            }}
           />
 
+          {/* Login Button */}
           <button
             style={{
-              width: "100%",
               padding: "12px",
-              background: "#057e47",
+              background: "#0aa06e",
               color: "#fff",
               border: "none",
               borderRadius: "8px",
               fontWeight: "bold",
-              fontSize: "15px",
+              fontSize: "16px",
               cursor: "pointer",
+              marginBottom: "15px",
               transition: "0.3s",
             }}
+            onMouseOver={(e:any) => (e.target.style.background = "#08895d")}
+            onMouseOut={(e:any) => (e.target.style.background = "#0aa06e")}
           >
             Login
           </button>
-          <p>
-            Don't have account ? <Link to={"/register"}>Register</Link>
+
+          {/* Register Link */}
+          <p style={{ color: "white", fontSize: "14px", textAlign: "center" }}>
+            Don't have an account?{" "}
+            <span
+              style={{ color: "#4fdfff", fontWeight: "bold" ,cursor:"pointer"}}
+              onClick={()=>setactiveForm("register")}
+            >
+              Register
+            </span>
           </p>
         </form>
       </div>
-    </div>
   );
 };
 

@@ -4,35 +4,37 @@ import { useDispatch, useSelector } from "react-redux";
 
 const Title = styled.h3`
   margin: 5px;
-  font-size: 24px;
+  font-size: 20px;
   color: white;
   margin-left: 12px;
 `;
 
-const Navbar = () => {
-  const user = useSelector((state: any) => state.user);
+interface NavbarProps {
+  user:any
+}
+const Navbar:React.FC<NavbarProps> = ({user}) => {
   const navigate = useNavigate();
   const dispatch = useDispatch()
 
   const handlelogout = () => {
     dispatch({type:"LOGOUT"})
-    navigate("/login");
+    navigate("/");
   };
   return (
-    user && (
+    (
       <div
         style={{
           display: "flex",
           justifyContent: "space-between",
-          backgroundColor: "black",
+          backgroundColor: "#de1313fd",
           padding: "0px 5px",
         }}
       > <Title>PetPuja</Title>
-        <Title>{user ? `Welcome, ${user.name} 👋` : ""}</Title>
+        <Title>{`Welcome, ${user.name} 👋`}</Title>
         <button
           onClick={handlelogout}
           style={{
-            backgroundColor: "red",
+            backgroundColor: "rgba(0,0,0,0.9)",
             color: "white",
             fontWeight: "bold",
             borderRadius: "6px",

@@ -1,19 +1,11 @@
 import axios from "axios";
 import { useState } from "react";
-import { Link } from "react-router-dom";
-import styled from "styled-components";
 
-export const StyledInput = styled.input`
-  width: 100%;
-  padding: 12px;
-  margin-bottom: 15px;
-  border-radius: 8px;
-  border: 1px solid #ccc;
-  font-size: 16px;
-  outline: none;
-  box-sizing: border-box;
-`;
-const Register = () => {
+interface RegisterProps {
+  setactiveForm: Function;
+}
+
+const Register: React.FC<RegisterProps> = ({ setactiveForm }) => {
   const [user, setuser] = useState({
     name: "",
     email: "",
@@ -26,95 +18,134 @@ const Register = () => {
     axios
       .post("http://localhost:5000/auth/register", user)
       .then(() => {
-        console.log("User registered successfully");
         alert("Registered Successfully");
-        setuser({
-          name: "",
-          email: "",
-          password: "",
-          phone: "",
-        });
+        setuser({ name: "", email: "", password: "", phone: "" });
       })
-      .catch((err) => console.log(err))
-      .finally(() => setuser({ name: "", email: "", password: "", phone: "" }));
+      .catch((err) => console.log(err));
   };
 
   return (
     <div
       style={{
-        height: "100vh",
-        width: "100%",
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        background: "linear-gradient(135deg, #659bd4ff, #FD746C)"
+        position: "absolute",
+        top: "50%",
+        right: "40px",
+        transform: "translateY(-50%)",
+        background: "rgba(0, 0, 0, 0.55)",
+        padding: "25px",
+        borderRadius: "12px",
+        width: "350px",
+        backdropFilter: "blur(4px)",
+        boxShadow: "0 4px 20px rgba(0,0,0,0.5)",
+        color: "white",
       }}
     >
-      <div
-        style={{
-          background: "#fff",
-          padding: "40px 30px",
-          borderRadius: "12px",
-          width: "400px",
-          boxShadow: "0px 6px 18px rgba(0,0,0,0.2)",
-          textAlign: "center",
-        }}
-      >
-        <h1 style={{ marginBottom: "25px", color: "#057e47" }}>📝 Register</h1>
-        <form onSubmit={handleRegister}>
-          <StyledInput
-            required
-            type="text"
-            placeholder="Enter name"
-            value={user.name}
-            onChange={(e) => setuser({ ...user, name: e.target.value })}
-          />
+      <h2 style={{ textAlign: "center", marginBottom: "20px" }}>Create Account</h2>
 
-          <StyledInput
-            required
-            type="email"
-            placeholder="Enter email"
-            value={user.email}
-            onChange={(e) => setuser({ ...user, email: e.target.value })}
-          />
+      <form style={{ display: "flex", flexDirection: "column" }} onSubmit={handleRegister}>
 
-          <StyledInput
-            required
-            type="password"
-            placeholder="Enter password"
-            value={user.password}
-            onChange={(e) => setuser({ ...user, password: e.target.value })}
-          />
+        {/* Name */}
+        <label style={{ marginBottom: "5px",textAlign:"left" }}>Name</label>
+        <input
+          required
+          type="text"
+          placeholder="Enter name"
+          value={user.name}
+          onChange={(e) => setuser({ ...user, name: e.target.value })}
+          style={{
+            padding: "12px",
+            borderRadius: "8px",
+            border: "none",
+            marginBottom: "15px",
+            fontSize: "15px",
+            outline: "none",
+          }}
+        />
 
-          <StyledInput
-            required
-            type="text"
-            placeholder="Enter phone"
-            value={user.phone}
-            onChange={(e) => setuser({ ...user, phone: e.target.value })}
-          />
+        {/* Email */}
+        <label style={{ marginBottom: "5px",textAlign:"left"}}>Email</label>
+        <input
+          required
+          type="email"
+          placeholder="Enter email"
+          value={user.email}
+          onChange={(e) => setuser({ ...user, email: e.target.value })}
+          style={{
+            padding: "12px",
+            borderRadius: "8px",
+            border: "none",
+            marginBottom: "15px",
+            fontSize: "15px",
+            outline: "none",
+          }}
+        />
 
-          <button
-            style={{
-              width: "100%",
-              padding: "12px",
-              background: "#057e47",
-              color: "#fff",
-              border: "none",
-              borderRadius: "8px",
-              fontWeight: "bold",
-              fontSize: "15px",
-              cursor: "pointer",
-              transition: "0.3s",
-            }}
+        {/* Password */}
+        <label style={{ marginBottom: "5px",textAlign:"left" }}>Password</label>
+        <input
+          required
+          type="password"
+          placeholder="Enter password"
+          value={user.password}
+          onChange={(e) => setuser({ ...user, password: e.target.value })}
+          style={{
+            padding: "12px",
+            borderRadius: "8px",
+            border: "none",
+            marginBottom: "15px",
+            fontSize: "15px",
+            outline: "none",
+          }}
+        />
+
+        {/* Phone */}
+        <label style={{ marginBottom: "5px",textAlign:"left" }}>Phone</label>
+        <input
+          required
+          type="text"
+          placeholder="Enter phone"
+          value={user.phone}
+          onChange={(e) => setuser({ ...user, phone: e.target.value })}
+          style={{
+            padding: "12px",
+            borderRadius: "8px",
+            border: "none",
+            marginBottom: "20px",
+            fontSize: "15px",
+            outline: "none",
+          }}
+        />
+
+        {/* Register Button */}
+        <button
+          style={{
+            padding: "12px",
+            background: "#0aa06e",
+            color: "#fff",
+            border: "none",
+            borderRadius: "8px",
+            fontWeight: "bold",
+            fontSize: "16px",
+            cursor: "pointer",
+            marginBottom: "15px",
+            transition: "0.3s",
+          }}
+          onMouseOver={(e: any) => (e.target.style.background = "#08895d")}
+          onMouseOut={(e: any) => (e.target.style.background = "#0aa06e")}
+        >
+          Register
+        </button>
+
+        <p style={{ textAlign: "center", fontSize: "14px" }}>
+          Already have an account?{" "}
+          <span
+            style={{ color: "#4fdfff", cursor: "pointer", fontWeight: "bold" }}
+            onClick={() => setactiveForm("login")}
           >
-            Register
-          </button>
-          <p>
-            already registered ? <Link to={"/login"}>Login</Link>
-          </p>
-        </form>
-      </div>
+            Login
+          </span>
+        </p>
+      </form>
     </div>
   );
 };
