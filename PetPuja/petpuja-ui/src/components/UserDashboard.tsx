@@ -3,7 +3,6 @@ import { useEffect, useState } from "react";
 import styled from "styled-components";
 import MenuItems from "./MenuItem";
 import { useSelector } from "react-redux";
-import Carousel from "./HomePage";
 
 const DashboardContainer = styled.div`
   display: grid;
@@ -73,8 +72,7 @@ const UserDashboard = () => {
   const [resto, setresto] = useState<any[]>([]);
   const [flag, setflag] = useState(false);
   const [menu, setmenu] = useState<any[]>([]);
-  const token = useSelector((state: any) => state.token);
-
+  const token=localStorage.getItem("token")
   useEffect(() => {
     axios
       .get("http://localhost:5000/user/all-restaurants", {

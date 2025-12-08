@@ -2,6 +2,9 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import styled from "styled-components";
+import { io } from "socket.io-client";
+import { toast, ToastContainer } from "react-toastify";
+const socket = io("http://localhost:5000", { autoConnect: false }); // global socket
 
 interface OrderData {
   order_id: number;
@@ -12,6 +15,7 @@ interface OrderData {
   customer_phone: string;
   restaurant_name: string;
   address: string;
+  rest_id: number;
 }
 
 interface OrderItem {
@@ -30,26 +34,30 @@ interface DeliveryPartner {
 
 const Container = styled.div`
   width: 100%;
-  padding: 10px;
+  padding: 5px 10px;
   background: #f5f7fa;
   min-height: 100vh;
 `;
 
 const Table = styled.table`
   width: 100%;
+  margin: 0 auto;
   border-collapse: collapse;
   background: #fff;
   border-radius: 8px;
-  overflow: hidden;
+  // overflow: hidden;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 `;
 
 const Th = styled.th`
   padding: 12px;
-  background: #0077ff;
+  background: #0c6efd;
   color: white;
   font-weight: 600;
   text-align: center;
+  position: sticky;
+  top: 0px;
+  z-index: 10;
 `;
 
 const Td = styled.td`
@@ -123,11 +131,21 @@ const ConfirmButton = styled.button`
     background: #218838;
   }
 `;
-
+ const Span=styled.span<{type:string}>`
+ border-radius:12px;
+ background:${({type})=>type==="Completed"?"green":"orange"};
+ font-weight:600;
+ color:white;
+ padding:4px 10px;
+ width:100%
+ `
+ 
 // ---------------- Component ----------------
 
 const OwnerDashboard = () => {
-  const { user, token } = useSelector((state: any) => state);
+  const { user} = useSelector((state: any) => state);
+  const token = localStorage.getItem("token");
+  const [activeTab, setactiveTab] = useState<string>("orders");
 
   const [orders, setOrders] = useState<OrderData[]>([]);
   const [detailsData, setDetailsData] = useState<OrderItem[]>([]);
@@ -139,16 +157,50 @@ const OwnerDashboard = () => {
     null
   );
 
-  useEffect(() => {
+  const fetchOrders = () => {
     if (!user.id) return;
-
     axios
       .get(`http://localhost:5000/owner/order/${user.id}`, {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((response) => setOrders(response.data))
       .catch((err) => console.error("Error fetching orders", err));
+  };
+  // useeffect for all socket related work
+  useEffect(() => {
+    socket.connect()
 
+    socket.on("connect", () => {
+      console.log("Connected:", socket.id);
+      socket.emit("joinOwnerRoom", user.id);
+    });
+    // socket listener
+    socket.on("newOrder", async () => {
+      toast.success(`New order received!`);
+      const audio = new Audio("./ding-sound.mp3");
+      audio.play();
+      try {
+        fetchOrders();
+      } catch (err) {
+        console.error("Failed to fetch latest orders", err);
+      }
+    });
+
+    socket.on("OrderStatusChanged", async (orderId) => {
+      toast.success(`Order No. ${orderId} is Delivered!`);
+      const audio=new Audio('./ding-sound.mp3')
+      audio.play()
+      fetchOrders();
+    });
+
+    return () => {
+      socket.off("newOrder");
+      socket.off("OrderStatusChanged");
+    };
+  }, []);
+
+  useEffect(() => {
+    fetchOrders();
     axios
       .get(`http://localhost:5000/owner/delivery-person`, {
         headers: { Authorization: `Bearer ${token}` },
@@ -209,97 +261,196 @@ const OwnerDashboard = () => {
 
   return (
     <Container>
-      <Table>
-        <thead>
-          <tr>
-            <Th>Order Id</Th>
-            <Th>Order Status</Th>
-            <Th>Amount</Th>
-            <Th>Payment Status</Th>
-            <Th>Customer Name</Th>
-            <Th>Customer Phone</Th>
-            <Th>Customer Address</Th>
-            <Th>Restaurant Name</Th>
-            <Th>Actions</Th>
-          </tr>
-        </thead>
-        <tbody>
-          {orders?.map((item) => (
-            <>
-              <tr key={item.order_id}>
-                <Td>{item.order_id}</Td>
-                <Td>{item.order_status}</Td>
-                <Td>₹{item.amount}</Td>
-                <Td>{item.payment_status}</Td>
-                <Td>{item.customer_name}</Td>
-                <Td>{item.customer_phone}</Td>
-                <Td>{item.address}</Td>
-                <Td>{item.restaurant_name}</Td>
-                <Td>
-                  <ActionButton onClick={() => handleDetails(item.order_id)}>
-                    {selectedOrderId === item.order_id ? "Hide" : "Details"}
-                  </ActionButton>
-                </Td>
-              </tr>
-
-              {selectedOrderId === item.order_id && (
-                <tr>
-                  <Td colSpan={8}>
-                    <InnerTable>
-                      <thead>
-                        <tr>
-                          <InnerTh>Item Name</InnerTh>
-                          <InnerTh>Price</InnerTh>
-                          <InnerTh>Quantity</InnerTh>
-                          <InnerTh>Subtotal</InnerTh>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {detailsData.map((d, index) => (
-                          <tr key={index}>
-                            <InnerTd>{d.name}</InnerTd>
-                            <InnerTd>₹{d.price}</InnerTd>
-                            <InnerTd>{d.qty}</InnerTd>
-                            <InnerTd>₹{d.subtotal}</InnerTd>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </InnerTable>
-
-                    {item.order_status === "Placed" && (
-                      <PartnerBox>
-                        <h4>Assign Delivery Partner</h4>
-                        <Select
-                          onChange={(e) =>
-                            setSelectedPartnerId(Number(e.target.value))
-                          }
-                          defaultValue=""
-                        >
-                          <option value="" disabled>
-                            Select Partner
-                          </option>
-                          {deliveryPartners.map((partner) => (
-                            <option key={partner.id} value={partner.id}>
-                              {partner.name}
-                            </option>
-                          ))}
-                        </Select>
-                        <ConfirmButton
-                          onClick={() => handleConfirmDispatch(item.order_id)}
-                        >
-                          Confirm
-                        </ConfirmButton>
-                      </PartnerBox>
-                    )}
+      <div className="d-flex align-items-center justify-content-center gap-3 mb-1">
+        <button
+          onClick={() => setactiveTab("orders")}
+          className="btn btn-info py-0 font-weight-bold text-white"
+        >
+          Orders
+        </button>
+        <button
+          onClick={() => setactiveTab("manage-menu")}
+          className="btn btn-info py-0 font-weight-bold text-white"
+        >
+          Menu
+        </button>
+      </div>
+      <ToastContainer
+        pauseOnHover
+        closeOnClick
+        autoClose={false}
+        position="top-center"
+        theme="colored"
+      />
+      {activeTab === "orders" ? (
+        <Table>
+          <thead>
+            <tr>
+              <Th>Order Id</Th>
+              <Th>Order Status</Th>
+              <Th>Amount</Th>
+              <Th>Payment Status</Th>
+              <Th>Customer Name</Th>
+              <Th>Customer Phone</Th>
+              <Th>Customer Address</Th>
+              <Th>Restaurant Name</Th>
+              <Th>Actions</Th>
+            </tr>
+          </thead>
+          <tbody>
+            {orders?.map((item) => (
+              <>
+                <tr key={item.order_id}>
+                  <Td>{item.order_id}</Td>
+                  <Td><Span type={item.order_status}>{item.order_status}</Span></Td>
+                  <Td>₹{item.amount}</Td>
+                  <Td>{item.payment_status}</Td>
+                  <Td>{item.customer_name}</Td>
+                  <Td>{item.customer_phone}</Td>
+                  <Td>{item.address}</Td>
+                  <Td>{item.restaurant_name}</Td>
+                  <Td>
+                    <ActionButton onClick={() => handleDetails(item.order_id)}>
+                      {selectedOrderId === item.order_id ? "Hide" : "Details"}
+                    </ActionButton>
                   </Td>
                 </tr>
-              )}
-            </>
-          ))}
-        </tbody>
-      </Table>
+
+                {selectedOrderId === item.order_id && (
+                  <tr>
+                    <Td colSpan={9}>
+                      <InnerTable>
+                        <thead>
+                          <tr>
+                            <InnerTh>Item Name</InnerTh>
+                            <InnerTh>Price</InnerTh>
+                            <InnerTh>Quantity</InnerTh>
+                            <InnerTh>Subtotal</InnerTh>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {detailsData.map((d, index) => (
+                            <tr key={index}>
+                              <InnerTd>{d.name}</InnerTd>
+                              <InnerTd>₹{d.price}</InnerTd>
+                              <InnerTd>{d.qty}</InnerTd>
+                              <InnerTd>₹{d.subtotal}</InnerTd>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </InnerTable>
+
+                      {item.order_status === "Placed" && (
+                        <PartnerBox>
+                          <h4>Assign Delivery Partner</h4>
+                          <Select
+                            onChange={(e) =>
+                              setSelectedPartnerId(Number(e.target.value))
+                            }
+                            defaultValue=""
+                          >
+                            <option value="" disabled>
+                              Select Partner
+                            </option>
+                            {deliveryPartners.map((partner) => (
+                              <option key={partner.id} value={partner.id}>
+                                {partner.name}
+                              </option>
+                            ))}
+                          </Select>
+                          <ConfirmButton
+                            onClick={() => handleConfirmDispatch(item.order_id)}
+                          >
+                            Confirm
+                          </ConfirmButton>
+                        </PartnerBox>
+                      )}
+                    </Td>
+                  </tr>
+                )}
+              </>
+            ))}
+          </tbody>
+        </Table>
+      ) : (
+        <MenuTable rest_id={orders[0].rest_id} token={token} />
+      )}
     </Container>
   );
 };
 
 export default OwnerDashboard;
+
+interface MenuTableProps {
+  rest_id: number;
+  token: string | null;
+}
+const MenuTable: React.FC<MenuTableProps> = ({ rest_id, token }) => {
+  const [menuItems, setmenuItems] = useState<any[]>([]);
+  useEffect(() => {
+    axios
+      .get(`http://localhost:5000/owner/menu-items/${rest_id}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      .then((response) => setmenuItems(response.data))
+      .catch((err) => console.log(err));
+  }, [rest_id, token]);
+
+  const toggleAvailability = (item_id: number, available: number) => {
+    axios
+      .put(
+        "http://localhost:5000/owner/toggle-menu",
+        { item_id, available },
+        { headers: { Authorization: `Bearer ${token}` } }
+      )
+      .then(() => {
+        setmenuItems((prev) =>
+          prev.map((m) => (m.item_id === item_id ? { ...m, available } : m))
+        );
+      })
+      .catch((err) => console.log(err));
+  };
+  return (
+    <Table>
+      <thead style={{ backgroundColor: "#0077ff" }}>
+        <tr>
+          <Th>Sr. No</Th>
+          <Th>Item</Th>
+          <Th>Price</Th>
+          <Th>Available</Th>
+        </tr>
+      </thead>
+      <tbody>
+        {menuItems.map((item, index) => (
+          <tr key={item.item_id}>
+            <Td>{index + 1}</Td>
+            <Td>{item.name}</Td>
+            <Td>{item.price}</Td>
+            <Td className="d-flex justify-content-center gap-2">
+              <label>
+                <input
+                  type="radio"
+                  checked={item.available == 1}
+                  name={`available-${item.item_id}`}
+                  value={1}
+                  onChange={() => toggleAvailability(item.item_id, 1)}
+                />
+                Yes
+              </label>
+              <label>
+                <input
+                  type="radio"
+                  checked={item.available == 0}
+                  name={`available-${item.item_id}`}
+                  value={0}
+                  onChange={() => toggleAvailability(item.item_id, 0)}
+                />
+                No
+              </label>
+            </Td>
+          </tr>
+        ))}
+      </tbody>
+    </Table>
+  );
+};

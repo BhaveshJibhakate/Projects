@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 
 const Title = styled.h3`
   margin: 5px;
-  font-size: 20px;
+  font-size: 16px;
   color: white;
   margin-left: 12px;
 `;
@@ -17,6 +17,8 @@ const Navbar:React.FC<NavbarProps> = ({user}) => {
   const dispatch = useDispatch()
 
   const handlelogout = () => {
+    localStorage.removeItem("token")
+    localStorage.removeItem("user")
     dispatch({type:"LOGOUT"})
     navigate("/");
   };
@@ -30,7 +32,7 @@ const Navbar:React.FC<NavbarProps> = ({user}) => {
           padding: "0px 5px",
         }}
       > <Title>PetPuja</Title>
-        <Title>{`Welcome, ${user.name} 👋`}</Title>
+        <Title>{`Welcome, ${user.name}`}</Title>
         <button
           onClick={handlelogout}
           style={{
@@ -39,8 +41,8 @@ const Navbar:React.FC<NavbarProps> = ({user}) => {
             fontWeight: "bold",
             borderRadius: "6px",
             fontSize: "16px",
-            padding: "5px 20px",
-            margin: "5px",
+            padding: "2px 15px",
+            margin: "3px",
             border: "none",
             cursor: "pointer",
           }}

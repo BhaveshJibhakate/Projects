@@ -18,7 +18,8 @@ const Login:React.FC<LoginProps> = ({setactiveForm})=> {
       .post(`${BASE_URL}auth/login`, credentials)
       .then((response) => {
         dispatch({ type: "LOGIN", payload: response.data });
-
+        localStorage.setItem("token",response.data.token)
+        localStorage.setItem("user",JSON.stringify(response.data.user))
         if (response.data.user.role === "user") {
           navigate("/user-dashboard");
         } else if (response.data.user.role === "owner") {

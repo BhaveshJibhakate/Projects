@@ -12,11 +12,19 @@ import ProtectedRoutes from "./components/ProtectedRoutes";
 import SearchBar from "./components/SearchBar";
 import AdminDashboard from "./components/AdminDashboard";
 import HomePage from "./components/HomePage";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 
 function App(): any {
-  const user = useSelector((state: any) => state.user);
-
+  // const user = JSON.parse(localStorage.getItem("user") || "null")
+  const user=useSelector((state:any)=>state.user)
+  const dispatch=useDispatch()
+  useEffect(()=>{
+    const saveduser=JSON.parse(localStorage.getItem("user") || "null")
+    const savedtoken=localStorage.getItem("token")
+    if(saveduser && savedtoken){
+      dispatch({type:"LOGIN",payload:{user:saveduser,token:savedtoken}})
+    }
+  },[])
   return (
     <Router>
       {user && <Navbar user={user}/>}

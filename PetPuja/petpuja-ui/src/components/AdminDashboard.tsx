@@ -1,13 +1,13 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
+
 interface UsersType {
   name: string;
 }
 function AdminDashboard() {
   const [taboption, setTaboption] = useState("user");
   const [users, setUsers] = useState<UsersType[]>([]);
-  const token=useSelector((state:any)=>state.token)
+  const token=localStorage.getItem("token")
 
   useEffect(() => {
     const fetchUser = async () => {

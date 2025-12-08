@@ -9,17 +9,19 @@ interface ProtectedRoutesProps {
 
 // this is called route guard
 const ProtectedRoutes = ({ children, allowedRoles }: ProtectedRoutesProps) => {
-const user=useSelector((state:any)=>state.user)
+    
+const token=localStorage.getItem("token")
+const user=JSON.parse(localStorage.getItem("user") || "null")
 const dispatch=useDispatch()
 
-    if (!user) {
+    if (!token) {
         return <Navigate to='/' />;
     }
     try {
-        if (user.role === allowedRoles) {
+        if (user?.role === allowedRoles) {
             return children;
         }
-        else return <h1>You are not authorized</h1>
+        // else return <h1>You are not authorized</h1>
     } catch (error) {
         dispatch({type:"LOGOUT"})
         return <Navigate to='/' replace/>

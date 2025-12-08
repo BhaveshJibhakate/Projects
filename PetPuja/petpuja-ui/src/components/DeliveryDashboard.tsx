@@ -2,6 +2,9 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import styled from "styled-components";
 import { useSelector } from "react-redux";
+import { io } from "socket.io-client";
+import { toast, ToastContainer } from "react-toastify";
+const socket = io("http://localhost:5000");
 
 interface DeliveryData {
   tracking_id: number;
@@ -29,17 +32,19 @@ const Table = styled.table`
   border-collapse: collapse;
   background: #fff;
   border-radius: 10px;
-  overflow: hidden;
+  // overflow: hidden;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 `;
 
 const Th = styled.th`
-  padding: 12px;
+  padding: 10px;
   background: #0077ff;
   color: white;
   font-weight: 600;
   text-align: center;
   font-size: 0.95rem;
+  position:sticky;
+  top:0px;
 `;
 
 const Td = styled.td`
@@ -85,23 +90,68 @@ const StatusBadge = styled.span<{ type: string }>`
 `;
 
 const DeliveryDashboard = () => {
-  const {token,user} = useSelector((state: any) => state);
+  const { user } = useSelector((state: any) => state);
+  const token=localStorage.getItem("token")
   const [Data, setData] = useState<DeliveryData[]>([]);
 
   useEffect(() => {
+    socket.connect();
+
+    socket.on("connect", () => {
+      console.log("Connected:", socket.id);
+      socket.emit("joinDeliveryRoom", user.id);
+    });
+    socket.on("OrderAssigned", async () => {
+      console.log("order assigned is triggered");
+      toast.success("New Order Assigned!");
+      const audio=new Audio("./ding-sound.mp3")
+      audio.play()
+      fetchTrackOrder();
+    });
+
+    return () => {
+    socket.off("OrderAssigned");
+    socket.disconnect()
+  };
+  }, []);
+
+  useEffect(() => {
+    fetchTrackOrder();
+  }, [user.id]);
+  const fetchTrackOrder = () => {
     axios
-      .get(`http://localhost:5000/delivery-person/track-order/${user.id}`, {
+      .get(`http://localhost:5000/delivery_person/track-order/${user.id}`, {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((response) => {
         setData(response.data);
       })
       .catch((err) => console.log(err));
-  }, [user.id]);
-
+  };
+  const handleStatus = (tracking_id: number, order_id: number) => {
+    axios
+      .put(
+        `http://localhost:5000/delivery_person/change-status/${tracking_id}`,
+        { order_id },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      )
+      .then(() => {
+        setData(
+          Data.map((m) =>
+            m.tracking_id === tracking_id
+              ? { ...m, status: "Delivered", order_status: "Completed" }
+              : m
+          )
+        );
+      })
+      .catch((err) => console.log(err));
+  };
   return (
     <Container>
       {/* <Title>Welcome, {decoded?.email} 👋</Title> */}
+      <ToastContainer position="top-center" theme="colored" autoClose={false} />
       <Table>
         <thead>
           <tr>
@@ -136,7 +186,15 @@ const DeliveryDashboard = () => {
               </Td>
               <Td>{new Date(item.updated_at).toLocaleString()}</Td>
               <Td>
-                {item.status !== "Delivered" && <Button>Mark Delivered</Button>}
+                {item.status !== "Delivered" && (
+                  <Button
+                    onClick={() =>
+                      handleStatus(item.tracking_id, item.order_id)
+                    }
+                  >
+                    Mark Delivered
+                  </Button>
+                )}
               </Td>
             </Row>
           ))}

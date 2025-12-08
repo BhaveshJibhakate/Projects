@@ -2,7 +2,8 @@ const express = require("express");
 
 const router = express.Router();
 const pool = require("../config/db");
-
+const { getIO } = require("../socket");
+const io = getIO();
 // api to get order received by owner for his restaurants
 router.get("/order/:id", async (req, resp) => {
   const owner_id = parseInt(req.params.id);
@@ -84,9 +85,12 @@ router.post("/dispatch-order", async (req, res) => {
   try {
     conn = await pool.getConnection();
     conn.beginTransaction();
-    // update orders table for associating the id of delivery person with orders
-    await pool.execute(`update orders set delivery_person_id=? where order_id=?`,[delivery_partner_id,order_id])
-    // Insert into delivery tracking
+    // update orders table for associating the id of delivery person with order
+    await pool.execute(
+      `update orders set delivery_person_id=? where order_id=?`,
+      [delivery_partner_id, order_id]
+    );
+    // Insert into delivery tracking table
     await pool.execute(
       `INSERT INTO delivery_tracking (order_id, delivery_person_id) VALUES (?, ?)`,
       [order_id, delivery_partner_id]
@@ -98,6 +102,7 @@ router.post("/dispatch-order", async (req, res) => {
     );
     // Send success response
     conn.commit();
+    io.to(`deliveryPerson_${delivery_partner_id}`).emit("OrderAssigned");
     res.status(200).json({ message: "Order dispatched successfully" });
   } catch (error) {
     conn.rollback();
@@ -106,4 +111,23 @@ router.post("/dispatch-order", async (req, res) => {
   }
 });
 
+// get menu item for particular restaurant
+router.get("/menu-items/:rest_id", async (req, resp) => {
+  const rest_id = req.params.rest_id;
+  const [result] = await pool.execute(
+    "select * from menu_items where rest_id=?",
+    [rest_id]
+  );
+  return resp.status(200).json(result);
+});
 module.exports = router;
+
+// toggle availability of menu item
+router.put("/toggle-menu", async (req, resp) => {
+  const { item_id, available } = req.body;
+  const [row] = await pool.execute(
+    "update menu_items set available=? where item_id=?",
+    [available, item_id]
+  );
+  return resp.status(200).json({ msg: "updated status successfully" });
+});
