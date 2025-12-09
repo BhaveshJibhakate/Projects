@@ -17,7 +17,7 @@ app.use(cookieParser());
 
 // CORS - allow frontend (adjust origin in production)
 app.use(cors({
-  origin: ["http://localhost:5173","https://projects-production-9dc3.up.railway.app"], // React dev server
+  origin: "http://localhost:5173", // React dev server
   credentials: true,
 }));
 
