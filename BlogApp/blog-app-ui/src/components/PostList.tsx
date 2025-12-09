@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
+import { URL } from "../App";
 
 export default function PostList() {
   const [posts, setPosts] = useState<any[]>([]);
@@ -8,7 +9,7 @@ export default function PostList() {
   const [postComments, setPostComments] = useState<any[]>([]);
 
   const fetchPosts = async () => {
-    const { data } = await axios.get("http://localhost:5000/api/posts", {
+    const { data } = await axios.get(`${URL}/api/posts`, {
       withCredentials: true,
     });
     setPosts(data);
@@ -23,7 +24,7 @@ export default function PostList() {
     if (!commentText.trim() || !selectedPost) return;
 
     const { data } = await axios.post(
-      `http://localhost:5000/api/comments/${selectedPost._id}`,
+      `${URL}/api/comments/${selectedPost._id}`,
       { text: commentText },
       { withCredentials: true }
     );
@@ -35,7 +36,7 @@ export default function PostList() {
 
   const fetchCommentsforPost = (post:any) => {
     axios
-      .get(`http://localhost:5000/api/comments/${post._id}`, {
+      .get(`${URL}/api/comments/${post._id}`, {
         withCredentials: true,
       })
       .then((res) => setPostComments(res.data))

@@ -1,16 +1,15 @@
 import axios from "axios";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import "../App.css";
 
+import "../App.css";
+import { URL } from "../App";
 interface AuthFormProps {
   onLogin: () => void;
 }
 
 const AuthForm = (props: AuthFormProps) => {
   const [mode, setMode] = useState("Login");
-  const navigate = useNavigate();
-
   const [formDetail, setFormDetail] = useState({
     name: "",
     email: "",
@@ -28,7 +27,7 @@ const AuthForm = (props: AuthFormProps) => {
     if (mode === "Login") {
       axios
         .post(
-          "http://localhost:5000/api/auth/login",
+          `${URL}/api/auth/login`,
           {
             email: formDetail.email,
             password: formDetail.password,
@@ -36,14 +35,13 @@ const AuthForm = (props: AuthFormProps) => {
           { withCredentials: true }
         )
         .then(() => {
-          props.onLogin();
-          navigate("/postlist");
+          props.onLogin()
         })
         .catch((err) => console.log(err.message));
     } else {
       axios
         .post(
-          "http://localhost:5000/api/auth/register",
+          `${URL}/api/auth/register`,
           {
             name: formDetail.name,
             email: formDetail.email,

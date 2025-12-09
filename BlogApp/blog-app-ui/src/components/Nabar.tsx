@@ -1,5 +1,6 @@
 import axios from "axios";
 import { Link } from "react-router-dom";
+import { URL } from "../App";
 
 interface NavbarProps {
   user: any;
@@ -10,7 +11,7 @@ const Navbar = ({ user, onLogout }: NavbarProps) => {
   const handleLogout = () => {
     axios
       .post(
-        "http://localhost:5000/api/auth/logout",
+        `${URL}/api/auth/logout`,
         {},
         { withCredentials: true }
       )

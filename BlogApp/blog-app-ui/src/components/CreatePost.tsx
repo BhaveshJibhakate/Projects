@@ -11,7 +11,7 @@ const CreatePost = () => {
     e.preventDefault();
     console.log("Post submitted:", form);
     axios
-      .post("http://localhost:5000/api/posts", form, { withCredentials: true })
+      .post(`${URL}/api/posts`, form, { withCredentials: true })
       .then(() => {
         console.log("success");
         setForm({title:"",content:""})
