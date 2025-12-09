@@ -15,7 +15,9 @@ const Navbar = ({ user, onLogout }: NavbarProps) => {
         { withCredentials: true }
       )
       .then(() => onLogout())
-      .catch((err) => console.log(err.message));
+      .catch((err) =>{ console.log(err.message)
+        alert("something went wrong")
+       });
   };
 
   return (
