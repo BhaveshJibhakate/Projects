@@ -12,14 +12,17 @@ const PORT = process.env.PORT || 5000;
 
 connectDB();
 
-app.use(express.json());
-app.use(cookieParser());
-
 // CORS - allow frontend (adjust origin in production)
 app.use(cors({
   origin: "http://localhost:5173", // React dev server
   credentials: true,
+  allowedHeaders: ["Content-Type"],
+
 }));
+
+app.use(express.json());
+
+app.use(cookieParser());
 
 // session
 app.use(sessionMiddleware);
