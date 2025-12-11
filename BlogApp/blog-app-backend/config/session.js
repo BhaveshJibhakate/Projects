@@ -13,7 +13,7 @@ module.exports = session({
   resave: false,
   saveUninitialized: false,
   cookie: {
-    httpOnly: true,
+    httpOnly: false,
     secure: true, // enable in production with HTTPS
     sameSite:"none",
     maxAge: 1000 * 60 * 60 * 24, // 1 day
