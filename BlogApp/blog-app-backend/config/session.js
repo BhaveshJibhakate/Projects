@@ -14,7 +14,7 @@ module.exports = session({
   saveUninitialized: false,
   cookie: {
     httpOnly: true,
-    secure: false, // enable in production with HTTPS
+    secure: true, // enable in production with HTTPS
     sameSite:"none",
     maxAge: 1000 * 60 * 60 * 24, // 1 day
   },
