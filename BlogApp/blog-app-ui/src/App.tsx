@@ -7,6 +7,7 @@ import axios from "axios";
 import { Routes, Route, useNavigate } from "react-router-dom";
 import CreatePost from "./components/CreatePost";
 export const URL = "https://projects-production-9dc3.up.railway.app";
+// export const URL="http://localhost:5000"
 
 function App() {
   const [user, setUser] = useState<any | null>(null);
